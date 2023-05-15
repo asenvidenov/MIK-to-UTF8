@@ -68,10 +68,14 @@ internal class Program
     private static async Task Main(string[] args)
     {
         InitDict();
-        if(args.Length == 0) { return; }
-        string? _fileX = Path.GetFileName(args[0]); ;
-        string? _file = Path.GetFileNameWithoutExtension(args[0]);
-        string? _folder = Path.GetDirectoryName(args[0]);
+        if(args.Length < 2) {
+            Console.WriteLine("Usage: FileSplitter csv|file File [DestDir]");
+            return; }
+        string _execmode = args[0];
+        string? _fileX = Path.GetFileName(args[1]); ;
+        string? _file = Path.GetFileNameWithoutExtension(args[1]);
+        string? _folder = Path.GetDirectoryName(args[1]);
+        string _fileext = Path.GetExtension(args[1]);
         Mapper _map = new();
         string _destFile;
         string? _destFolder;
@@ -79,29 +83,56 @@ internal class Program
         byte cntr;
         double readed;
         byte[] nBuff;
-        if (_fileX !=null)
+        if (_execmode == "csv")
         {
-            switch (_file)
+            if (_fileX != null)
             {
-                case "AMV":
-                    _map.headerLen = 0;
-                    _map.rowLen = 180;
-                    InitAMVData(ref _map.Data);
-                    break;
-                default: return;
+                switch (_fileext)
+                {
+                    case ".HLP":
+                        _map.headerLen = 0;
+                        _map.rowLen = 1;
+                        _fileext = ".txt";
+                        break;
+                    default:
+
+                        switch (_file)
+                        {
+                            case "AMV":
+                                _map.headerLen = 0;
+                                _map.rowLen = 180;
+                                InitAMVData(ref _map.Data);
+                                _fileext = ".csv";
+                                break;
+
+
+                            default: return;
+                        }
+                        break;
+                }
             }
+            else { return; }
         }
-        else { return; }
+        else
+        {
+            _map.headerLen = 0;
+            _map.rowLen = 1;
+        }
         List<char> cList=new();
-        FileStream stream =new(args[0], FileMode.Open, FileAccess.Read);
+        FileStream stream =new(args[1], FileMode.Open, FileAccess.Read);
         byte[] block =new byte[_map.rowLen];
-        _destFolder = (args.Length > 1) ? Path.GetDirectoryName(args[1]) : _folder;
+        _destFolder = (args.Length > 2) ? Path.GetDirectoryName(args[2]) : _folder;
         _destFolder = (_destFolder != null) ? _destFolder : string.Empty;
-        _destFile = Path.Combine(_destFolder, _file + ".csv");
+        _destFile = Path.Combine(_destFolder, "UTF8" + _file + _fileext);
         using FileStream file =File.OpenWrite(_destFile);
         {
             while (stream.Read(block, _map.headerLen, _map.rowLen) > 0)
             {
+                if (_map.rowLen == 1)
+                {
+                    await file.WriteAsync(Encoding.UTF8.GetBytes(new char[1] { MIK.mik2U(block[0]) }));
+                    continue;
+                }
                 offset=0;
                 cntr = 0;
                 foreach (var dl in _map.Data)

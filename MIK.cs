@@ -2,11 +2,20 @@
 {
     static class MIK
     {
+        public static bool isOutOfRange = false;
         public static char mik2U(byte rc)
         {
+            if (rc < 0x20)
+            {
+                //Console.WriteLine("{0}", rc);
+                if (rc == 1) { rc = 126; }
+                else {
+                    rc = 0x20; //REPLACES ALL SYMBOLS BEFORE SPACE WITH SPACE
+                }
+            }
+
             switch (rc)
             {
-
                 case 0x20: return '\u0020';//  SPACE
                 case 0x21: return '\u0021';//  EXCLAMATION MARK
                 case 0x22: return '\u0022';//  QUOTATION MARK
@@ -19,7 +28,8 @@
                 case 0x29: return '\u0029';//  RIGHT PARENTHESIS
                 case 0x2A: return '\u002A';// ASTERISK
                 case 0x2B: return '\u002B';// PLUS SIGN
-                case 0x2C: return '\u002C';// COMMA
+                //case 0x2C: return '\u002C';// COMMA
+                case 0x2C: return '\u0020';// REPLACES COMMA WITH SPACE
                 case 0x2D: return '\u002D';//  HYPHEN - MINUS
                 case 0x2E: return '\u002E';//  FULL STOP
                 case 0x2F: return '\u002F';//  SOLIDUS

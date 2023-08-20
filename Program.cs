@@ -1,68 +1,44 @@
 ﻿using FileSplitter;
 using System.Text;
 
-interface IDataMap
+public interface IDataMap
 {
     int Len { get; set; }
     char Type { get; set; }
+}
+public struct DataMap : IDataMap
+{
+    public DataMap(int len, char type)
+    {
+        _len = len;
+        _type = type;
+    }
+    public int Len { get => _len; set => _len = value; }
+    public char Type { get => _type; set => _type = value; }
+    int _len;
+    char _type;
+}
+public struct Mapper
+{
+    internal int headerLen;
+    internal int rowLen;
+    internal List<IDataMap> Data;
 }
 internal class Program
 {
     static Dictionary<char, byte> TypeLen=new();
 
-    struct DataMap : IDataMap
-    {
-        public DataMap(int len, char type) 
-        {
-            _len= len;
-            _type= type;
-        }
-        public int Len { get=>_len; set=>_len=value; }
-        public char Type { get=>_type; set=>_type=value; }
-        int _len;
-        char _type;
-    }
-    struct Mapper
-    {
-        internal int headerLen;
-        internal int rowLen;
-        internal List<IDataMap> Data;
-    }
+
 
     static void InitDict()
     {
         TypeLen.Add('T', 8);
-        TypeLen.Add('N', 8);
-        TypeLen.Add('L', 16);
-        TypeLen.Add('D', 8);
-    }
-
-    static void InitAMVData(ref List<IDataMap> mapper)
-    {
-         mapper = new()
-        {
-                new DataMap(5, 'T'),
-                new DataMap(5, 'S'),
-                new DataMap(5, 'S'),
-                new DataMap(23, 'S'),
-                new DataMap(6, 'S'),
-                new DataMap(16, 'S'),
-                new DataMap(16, 'S'),
-                new DataMap(3, 'N'),
-                new DataMap(3, 'N'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D'),
-                new DataMap(8, 'D')
-        };
+        TypeLen.Add('N', 16);
+        TypeLen.Add('y', 16);
+        TypeLen.Add('m', 16);
+        TypeLen.Add('d', 16);
+        TypeLen.Add('L', 32);
+        TypeLen.Add('D', 16);
     }
 
     private static async Task Main(string[] args)
@@ -96,15 +72,20 @@ internal class Program
                         break;
                     default:
 
-                        switch (_file)
+                        switch (_fileX)
                         {
-                            case "AMV":
+                            case "AMV.FIX":
                                 _map.headerLen = 0;
                                 _map.rowLen = 180;
-                                InitAMVData(ref _map.Data);
+                                new AMV(ref _map.Data);
                                 _fileext = ".csv";
                                 break;
-
+                            case "ACT.FIX":
+                                _map.headerLen = 0;
+                                _map.rowLen = 650;
+                                new ACT(ref _map.Data);
+                                _fileext = ".csv";
+                                break;
 
                             default: return;
                         }
@@ -141,7 +122,14 @@ internal class Program
                     {
                         foreach (byte b in new ReadOnlySpan<byte>(block, offset, dl.Len).ToArray())
                         {
-                            cList.Add(MIK.mik2U(b));
+                            //if (b == 44)
+                            //{
+                            //    cList.Add(MIK.mik2U(47));
+                            //}
+                            //else
+                            //{
+                                cList.Add(MIK.mik2U(b));
+
                         }
                         await file.WriteAsync(System.Text.Encoding.UTF8.GetBytes(cList.ToArray()));
                         await file.WriteAsync(Encoding.UTF8.GetBytes(","));
@@ -175,9 +163,39 @@ internal class Program
                         await file.WriteAsync(Encoding.UTF8.GetBytes(((uint)readed).ToString()));
                         await file.WriteAsync(Encoding.UTF8.GetBytes(","));
                     }
+                    else if (dl.Type == 'y')
+                    {
+
+                        TypeLen.TryGetValue(dl.Type, out byte i);
+                        nBuff = new byte[i];
+                        new ReadOnlySpan<byte>(block, offset, dl.Len).ToArray().CopyTo(nBuff, 0);
+                        readed = BitConverter.ToUInt32(nBuff)+2000;
+                        await file.WriteAsync(Encoding.UTF8.GetBytes(((uint)readed).ToString()));
+                        await file.WriteAsync(Encoding.UTF8.GetBytes("-"));
+                    }
+                    else if (dl.Type == 'm')
+                    {
+
+                        TypeLen.TryGetValue(dl.Type, out byte i);
+                        nBuff = new byte[i];
+                        new ReadOnlySpan<byte>(block, offset, dl.Len).ToArray().CopyTo(nBuff, 0);
+                        readed = BitConverter.ToUInt32(nBuff);
+                        await file.WriteAsync(Encoding.UTF8.GetBytes(((uint)readed).ToString()));
+                        await file.WriteAsync(Encoding.UTF8.GetBytes("-"));
+                    }
+                    else if (dl.Type == 'd')
+                    {
+
+                        TypeLen.TryGetValue(dl.Type, out byte i);
+                        nBuff = new byte[i];
+                        new ReadOnlySpan<byte>(block, offset, dl.Len).ToArray().CopyTo(nBuff, 0);
+                        readed = BitConverter.ToUInt32(nBuff);
+                        await file.WriteAsync(Encoding.UTF8.GetBytes(((uint)readed).ToString()));
+                        await file.WriteAsync(Encoding.UTF8.GetBytes(","));
+                    }
                     offset += _map.Data[cntr++].Len;
                 }
-                await file.WriteAsync(Encoding.Unicode.GetBytes("\n"));
+                await file.WriteAsync(Encoding.Unicode.GetBytes("\r"));
             }
         }
     }

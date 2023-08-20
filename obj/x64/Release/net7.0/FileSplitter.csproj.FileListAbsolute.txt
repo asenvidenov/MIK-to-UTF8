@@ -1,0 +1,15 @@
+C:\A SOURCE\MIK-to-UTF8\bin\x64\Release\net7.0\FileSplitter.exe
+C:\A SOURCE\MIK-to-UTF8\bin\x64\Release\net7.0\FileSplitter.deps.json
+C:\A SOURCE\MIK-to-UTF8\bin\x64\Release\net7.0\FileSplitter.runtimeconfig.json
+C:\A SOURCE\MIK-to-UTF8\bin\x64\Release\net7.0\FileSplitter.dll
+C:\A SOURCE\MIK-to-UTF8\bin\x64\Release\net7.0\FileSplitter.pdb
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.csproj.AssemblyReference.cache
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.GeneratedMSBuildEditorConfig.editorconfig
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.AssemblyInfoInputs.cache
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.AssemblyInfo.cs
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.csproj.CoreCompileInputs.cache
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.dll
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\refint\FileSplitter.dll
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.pdb
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\FileSplitter.genruntimeconfig.cache
+C:\A SOURCE\MIK-to-UTF8\obj\x64\Release\net7.0\ref\FileSplitter.dll

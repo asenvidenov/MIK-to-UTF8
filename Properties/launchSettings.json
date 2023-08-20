@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FileSplitter": {
+      "commandName": "Project",
+      "commandLineArgs": "csv ACT.FIX"
+    }
+  }
+}
